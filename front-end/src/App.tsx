@@ -34,7 +34,11 @@ class App extends React.Component<Props, GameState> {
     /**
      * state has type GameState as specified in the class inheritance.
      */
-    this.state = { cells: [] }
+    this.state = {
+       cells: [],
+        currentPlayer: "",
+        winner: ""
+      }
   }
 
   /**
@@ -45,7 +49,11 @@ class App extends React.Component<Props, GameState> {
   newGame = async () => {
     const response = await fetch('/newgame');
     const json = await response.json();
-    this.setState({ cells: json['cells'] });
+    this.setState({
+      cells: json['cells'],
+      currentPlayer: json['currentPlayer'],
+      winner: json['winner']
+    });
   }
 
   /**
@@ -61,7 +69,14 @@ class App extends React.Component<Props, GameState> {
       e.preventDefault();
       const response = await fetch(`/play?x=${x}&y=${y}`)
       const json = await response.json();
-      this.setState({ cells: json['cells'] });
+      this.setState({
+        cells: json['cells'],
+        currentPlayer: json['currentPlayer'],
+        winner: json['winner']
+      });
+      console.log("Cells: " + json['cells']);
+      console.log("Current player: " + json['currentPlayer']);
+      console.log("Winner: " + json['winner']);
     }
   }
 
@@ -108,6 +123,8 @@ class App extends React.Component<Props, GameState> {
    * @see https://reactjs.org/docs/react-component.html
    */
   render(): React.ReactNode {
+    const currentPlayer = this.state.currentPlayer;
+    const winner = this.state.winner;
     /**
      * We use JSX to define the template. An advantage of JSX is that you
      * can treat HTML elements as code.
@@ -115,6 +132,9 @@ class App extends React.Component<Props, GameState> {
      */
     return (
       <div>
+        <div id= "playerturn">          
+          {winner !== "-1" ? <h3>Winner: {winner}</h3> : <h3>Current Player: {currentPlayer}</h3>}
+        </div>
         <div id="board">
           {this.state.cells.map((cell, i) => this.createCell(cell, i))}
         </div>
